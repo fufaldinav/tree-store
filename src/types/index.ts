@@ -11,8 +11,8 @@ interface TreeItemInterface {
 export type TreeItem = Partial<TreeItemInterface> &
   Pick<TreeItemInterface, RequiredFields> &
   Record<PropertyKey, unknown>;
-type MappedItem = Omit<TreeItem, "id">;
-export type MappedItemStorage = Map<Id, MappedItem>;
+export type MappedItemStorage = Map<TreeItem["id"], TreeItem>;
+export type MappedItemRelations = Map<TreeItem["parent"], TreeItem[]>;
 
 export type TreeStoreOptions = {
   ignoreDuplicates?: boolean;

@@ -1,17 +1,20 @@
 import { MESSAGES, ROOT_ID } from "./constants";
-import {
+import type {
+  MappedItemRelations,
   MappedItemStorage,
   TreeItem,
   TreeStoreInterface,
   TreeStoreOptions,
 } from "./types";
+import sourceItems from "./source-items.json";
 
 export class TreeStore implements TreeStoreInterface {
   private ignoreDuplicates: boolean;
   private ignoreRoot: boolean;
   private ignoreIdType: boolean;
   private sourceItems: TreeItem[];
-  private mappedItems: MappedItemStorage;
+  private mappedItems: MappedItemStorage = new Map();
+  private mappedItemRelations: MappedItemRelations = new Map();
 
   private checkDuplicates() {
     if (this.sourceItems.length === this.mappedItems.size) {
@@ -49,14 +52,37 @@ export class TreeStore implements TreeStoreInterface {
     }
   }
 
-  private mapItems(items: TreeItem[]) {
-    const mappedItems: MappedItemStorage = new Map();
-    items.forEach(({ id, ...data }) => {
-      this.checkIdType(id);
-      mappedItems.set(id, data);
-    });
-    return mappedItems;
+  private createOrUpdateRelation(item: TreeItem) {
+    const parentId = item.parent ?? ROOT_ID;
+    if (!this.mappedItemRelations.has(parentId)) {
+      this.mappedItemRelations.set(parentId, [item]);
+    } else {
+      this.mappedItemRelations.get(parentId)?.push(item);
+    }
   }
+
+  private mapSourceItems() {
+    this.sourceItems.forEach((item) => {
+      const id = item.id;
+      this.checkIdType(id);
+
+      const parentId = item.parent;
+      if (parentId !== undefined) this.checkIdType(parentId);
+
+      this.mappedItems.set(id, item);
+      this.createOrUpdateRelation(item);
+    });
+  }
+
+  // private getItemsById(...ids: TreeItem["id"][]): TreeItem[] {
+  //   const items: TreeItem[] = [];
+  //   for (const id of ids) {
+  //     const item = this.mappedItems.get(id);
+  //     if (!item) continue;
+  //     items.push(item);
+  //   }
+  //   return items;
+  // }
 
   constructor(items: TreeItem[], options: TreeStoreOptions = {}) {
     this.sourceItems = items;
@@ -71,15 +97,50 @@ export class TreeStore implements TreeStoreInterface {
     this.ignoreRoot = ignoreRoot;
     this.ignoreIdType = ignoreIdType;
 
-    this.mappedItems = this.mapItems(items);
+    this.mapSourceItems();
 
     this.checkDuplicates();
     this.checkRoot();
   }
 
-  getAll: () => [];
-  getItem: (id: TreeItem["id"]) => null;
-  getChildren: (id: TreeItem["id"]) => [];
-  getAllChildren: (id: TreeItem["id"]) => [];
-  getAllParents: (id: TreeItem["id"]) => [];
+  getAll() {
+    return this.sourceItems;
+  }
+
+  getItem(id: TreeItem["id"]) {
+    this.checkIdType(id);
+    return this.mappedItems.get(id) ?? null;
+  }
+
+  getChildren(id: TreeItem["id"]) {
+    this.checkIdType(id);
+    return this.mappedItemRelations.get(id) ?? [];
+  }
+
+  getAllChildren(id: TreeItem["id"]) {
+    this.checkIdType(id);
+    const allChildren = this.getChildren(id);
+    if (allChildren.length === 0) return allChildren;
+
+    allChildren.forEach(({ id }) => {
+      allChildren.push(...this.getAllChildren(id));
+    });
+
+    return allChildren;
+  }
+
+  getAllParents(id: TreeItem["id"]) {
+    this.checkIdType(id);
+    console.warn("getAllParents is not implemented yet");
+    return [];
+  }
 }
+
+const ts = new TreeStore(sourceItems);
+console.log(ts.getAll(), "\n");
+console.log(ts.getItem(7), "\n");
+console.log(ts.getChildren(4), "\n");
+console.log(ts.getChildren(5), "\n");
+console.log(ts.getChildren(2), "\n");
+console.log(ts.getAllChildren(2), "\n");
+console.log(ts.getAllParents(7), "\n");
