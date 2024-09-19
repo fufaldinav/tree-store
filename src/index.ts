@@ -1,37 +1,10 @@
-const ROOT_ID = "root";
-const MESSAGES = {
-  ROOT_ITEM_FOUND: "Root item found in items",
-  DUPLICATES_FOUND: "Duplicates found in items",
-  ID_TYPE_INVALID: "Id type must be a number or a string",
-};
-
-type RootId = typeof ROOT_ID;
-type Id = number | string;
-type RequiredFields = "id" | "parent" | "type";
-interface TreeItemInterface {
-  id: Id;
-  parent: RootId | Id;
-  type?: unknown;
-}
-type TreeItem = Partial<TreeItemInterface> &
-  Pick<TreeItemInterface, RequiredFields> &
-  Record<PropertyKey, unknown>;
-type MappedItem = Omit<TreeItem, "id">;
-type MappedItemStorage = Map<Id, MappedItem>;
-
-type TreeStoreOptions = {
-  ignoreDuplicates?: boolean;
-  ignoreRoot?: boolean;
-  ignoreIdType?: boolean;
-};
-
-interface TreeStoreInterface {
-  getAll: () => TreeItem[];
-  getItem: (id: Id) => TreeItem | null;
-  getChildren: (id: Id) => TreeItem[];
-  getAllChildren: (id: Id) => TreeItem[];
-  getAllParents: (id: Id) => TreeItem[];
-}
+import { MESSAGES, ROOT_ID } from "./constants";
+import {
+  MappedItemStorage,
+  TreeItem,
+  TreeStoreInterface,
+  TreeStoreOptions,
+} from "./types";
 
 export class TreeStore implements TreeStoreInterface {
   private ignoreDuplicates: boolean;
@@ -64,7 +37,7 @@ export class TreeStore implements TreeStoreInterface {
     }
   }
 
-  private checkIdType(id: Id) {
+  private checkIdType(id: TreeItem["id"]) {
     if (this.ignoreIdType) {
       return;
     }
@@ -105,8 +78,8 @@ export class TreeStore implements TreeStoreInterface {
   }
 
   getAll: () => [];
-  getItem: (id: Id) => null;
-  getChildren: (id: Id) => [];
-  getAllChildren: (id: Id) => [];
-  getAllParents: (id: Id) => [];
+  getItem: (id: TreeItem["id"]) => null;
+  getChildren: (id: TreeItem["id"]) => [];
+  getAllChildren: (id: TreeItem["id"]) => [];
+  getAllParents: (id: TreeItem["id"]) => [];
 }
