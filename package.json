@@ -1,0 +1,29 @@
+{
+  "name": "tree-store",
+  "version": "0.0.1",
+  "description": "Test case of TreeStore class",
+  "main": "index.js",
+  "scripts": {
+    "test": "node"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fufaldinav/tree-store.git"
+  },
+  "keywords": [
+    "tree-store"
+  ],
+  "author": "Artem Fufaldin",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/fufaldinav/tree-store/issues"
+  },
+  "homepage": "https://github.com/fufaldinav/tree-store#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.10.0",
+    "@types/eslint__js": "^8.42.3",
+    "eslint": "^9.10.0",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.6.0"
+  }
+}
