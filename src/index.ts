@@ -6,7 +6,6 @@ import type {
   TreeStoreInterface,
   TreeStoreOptions,
 } from "./types";
-import sourceItems from "./source-items.json";
 
 export class TreeStore implements TreeStoreInterface {
   private ignoreDuplicates: boolean;
@@ -78,16 +77,6 @@ export class TreeStore implements TreeStoreInterface {
     });
   }
 
-  // private getItemsById(...ids: TreeItem["id"][]): TreeItem[] {
-  //   const items: TreeItem[] = [];
-  //   for (const id of ids) {
-  //     const item = this.mappedItems.get(id);
-  //     if (!item) continue;
-  //     items.push(item);
-  //   }
-  //   return items;
-  // }
-
   constructor(items: TreeItem[], options: TreeStoreOptions = {}) {
     this.sourceItems = items;
 
@@ -151,12 +140,3 @@ export class TreeStore implements TreeStoreInterface {
     return parents;
   }
 }
-
-const ts = new TreeStore(sourceItems);
-console.log(ts.getAll(), "\n");
-console.log(ts.getItem(7), "\n");
-console.log(ts.getChildren(4), "\n");
-console.log(ts.getChildren(5), "\n");
-console.log(ts.getChildren(2), "\n");
-console.log(ts.getAllChildren(2), "\n");
-console.log(ts.getAllParents(7), "\n");
