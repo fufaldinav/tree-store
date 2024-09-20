@@ -52,8 +52,12 @@ export class TreeStore implements TreeStoreInterface {
     }
   }
 
+  private getParentId(item: TreeItem): TreeItem["parent"] {
+    return item.parent ?? ROOT_ID;
+  }
+
   private createOrUpdateRelation(item: TreeItem) {
-    const parentId = item.parent ?? ROOT_ID;
+    const parentId = this.getParentId(item);
     if (!this.mappedItemRelations.has(parentId)) {
       this.mappedItemRelations.set(parentId, [item]);
     } else {
@@ -130,9 +134,21 @@ export class TreeStore implements TreeStoreInterface {
   }
 
   getAllParents(id: TreeItem["id"]) {
-    this.checkIdType(id);
-    console.warn("getAllParents is not implemented yet");
-    return [];
+    const parents: TreeItem[] = [];
+
+    const child = this.getItem(id);
+    if (!child) return parents;
+
+    let parentId = this.getParentId(child);
+
+    while (parentId !== ROOT_ID) {
+      const currentParent = this.getItem(parentId);
+      if (!currentParent) break;
+      parents.push(currentParent);
+      parentId = this.getParentId(currentParent);
+    }
+
+    return parents;
   }
 }
 
